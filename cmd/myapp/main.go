@@ -35,9 +35,9 @@ func main() {
 	e.Use(middleware.RequestID())
 	e.Use(middleware.Recover())
 
-	e.POST("/calculate-sum", handlers.PostHandler(logger, store))
-	e.POST("/calculate-multiply", handlers.MultiplyHandler(logger, store))
-	e.GET("/results", handlers.GetAllResultsHandler(logger, store))
+	e.POST("/sum", handlers.PostHandler(logger, store))
+	e.POST("/multiply", handlers.MultiplyHandler(logger, store))
+	e.GET("/results", handlers.GetAllResultsByTokenHandler(logger, store))
 
 	go func() {
 		if err := e.Start(":" + cfg.Server.Port); err != nil && err != http.ErrServerClosed {

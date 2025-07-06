@@ -21,6 +21,10 @@ func PostHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFu
 			return echo.NewHTTPError(http.StatusBadRequest, "Invalid data format")
 		}
 
+		if nums.Token == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "Token is requived")
+		}
+
 		if nums.Values == nil {
 			logger.Info("Received numbers", "values", "nil slice")
 		} else {
@@ -29,11 +33,15 @@ func PostHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFu
 
 		total := usecase.CalculateSum(nums.Values)
 
-		resp := models.SumResponse{Sum: total}
+		resp := models.SumResponse{
+			Token: nums.Token,
+			Sum:   total,
+		}
+
 		logger.Info("Calculated sum", "sum", total)
 
 		key := strconv.FormatInt(time.Now().UnixNano(), 10)
-		store.Save(key, total)
+		store.Save(nums.Token, key, total)
 
 		return c.JSON(http.StatusOK, resp)
 	}
@@ -45,6 +53,9 @@ func MultiplyHandler(logger *slog.Logger, store *storage.ResultStore) echo.Handl
 			logger.Error("Failed to bind multiply request", "error", err.Error())
 			return echo.NewHTTPError(http.StatusBadRequest, "Invalid data format")
 		}
+		if req.Token == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "Token is requived")
+		}
 		if req.Values == nil {
 			logger.Info("Received numbers", "values", "nil slice")
 		} else {
@@ -53,19 +64,36 @@ func MultiplyHandler(logger *slog.Logger, store *storage.ResultStore) echo.Handl
 
 		multiply := usecase.CalculatedMultiply(req.Values)
 
+		resp := models.MultiplyResponse{
+			Token:    req.Token,
+			Multiply: multiply,
+		}
 		logger.Info("Calculated multiply", "multiply", multiply)
-		resp := models.MultiplyResponse{Multiply: multiply}
 
 		key := strconv.FormatInt(time.Now().UnixNano(), 10)
-		store.Save(key, multiply)
+		store.Save(req.Token, key, multiply)
 
 		return c.JSON(http.StatusOK, resp)
 	}
 }
 
-func GetAllResultsHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
+func GetAllResultsByTokenHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		results := store.GetAll()
+		token := c.QueryParam("token")
+		if token == "" {
+			return echo.NewHTTPError(http.StatusBadRequest, "Token query param is required")
+		}
+		results := store.GetAllByToken(token)
+		if results == nil {
+			results = map[string]float64{}
+		}
 		return c.JSON(http.StatusOK, results)
 	}
 }
+
+// func GetAllResultsHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		results := store.GetAll()
+// 		return c.JSON(http.StatusOK, results)
+// 	}
+// }

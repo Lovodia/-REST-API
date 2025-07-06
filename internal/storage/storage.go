@@ -6,34 +6,48 @@ import (
 
 type ResultStore struct {
 	mu      sync.Mutex
-	results map[string]float64
+	results map[string]map[string]float64
 }
 
 func NewResultStore() *ResultStore {
 	return &ResultStore{
-		results: make(map[string]float64),
+		results: make(map[string]map[string]float64),
 	}
 }
 
-func (s *ResultStore) Save(key string, value float64) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.results[key] = value
-}
+// func (s *ResultStore) Save(key string, value float64) {
+// 	s.mu.Lock()
+// 	defer s.mu.Unlock()
+// 	s.results[key] = value
+// }
 
-func (s *ResultStore) Get(key string) (float64, bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	val, ok := s.results[key]
-	return val, ok
-}
+// func (s *ResultStore) Get(key string) (float64, bool) {
+// 	s.mu.Lock()
+// 	defer s.mu.Unlock()
+// 	val, ok := s.results[key]
+// 	return val, ok
+//}
 
-func (s *ResultStore) GetAll() map[string]float64 {
+func (s *ResultStore) Save(token string, key string, value float64) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	copy := make(map[string]float64, len(s.results))
-	for k, v := range s.results {
-		copy[k] = v
+
+	if _, exists := s.results[token]; !exists {
+		s.results[token] = make(map[string]float64)
 	}
-	return copy
+	s.results[token][key] = value
+}
+
+func (s *ResultStore) GetAllByToken(token string) map[string]float64 {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if res, exists := s.results[token]; exists {
+		copy := make(map[string]float64, len(res))
+		for k, v := range res {
+			copy[k] = v
+		}
+		return copy
+	}
+	return nil
 }
