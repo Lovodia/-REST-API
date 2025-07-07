@@ -1,8 +1,26 @@
+// Package main API сервер для вычислений
+
+// Документация Swagger.
+
+// 	Schemest: http https
+// 	Host: localhost:8080
+// 	BasePath: /
+// 	Version: 1.0.0
+// 	Contact: Your Name
+
+// 	Consumes:
+// 	-application/json
+
+// 	Produces:
+// 	-application/json
+
+// 	Swagger:meta
+
 package main
 
 import (
 	"context"
-	"log/slog"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,23 +30,21 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	_ "github.com/Lovodia/restapi/docs"
 	"github.com/Lovodia/restapi/internal/handlers"
 	"github.com/Lovodia/restapi/internal/storage"
 	"github.com/Lovodia/restapi/pkg/config"
-	loggerSwitch "github.com/Lovodia/restapi/pkg/logger"
+	loggerswitch "github.com/Lovodia/restapi/pkg/logger"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func main() {
 	cfg, err := config.LoadConfig("config.yaml")
 	if err != nil {
-		tempLogger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
-			Level: slog.LevelInfo,
-		}))
-		tempLogger.Error("failed to load config", "error", err)
-		os.Exit(1)
+		log.Fatalf("failed to load config: %v", err)
 	}
 
-	logger := loggerSwitch.NewLogger(cfg.Logger.Level)
+	logger := loggerswitch.NewLogger(cfg.Logger.Level)
 	store := storage.NewResultStore()
 	e := echo.New()
 
@@ -38,6 +54,7 @@ func main() {
 	e.POST("/sum", handlers.PostHandler(logger, store))
 	e.POST("/multiply", handlers.MultiplyHandler(logger, store))
 	e.GET("/results", handlers.GetAllResultsByTokenHandler(logger, store))
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	go func() {
 		if err := e.Start(":" + cfg.Server.Port); err != nil && err != http.ErrServerClosed {

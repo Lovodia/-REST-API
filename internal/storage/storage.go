@@ -15,19 +15,6 @@ func NewResultStore() *ResultStore {
 	}
 }
 
-// func (s *ResultStore) Save(key string, value float64) {
-// 	s.mu.Lock()
-// 	defer s.mu.Unlock()
-// 	s.results[key] = value
-// }
-
-// func (s *ResultStore) Get(key string) (float64, bool) {
-// 	s.mu.Lock()
-// 	defer s.mu.Unlock()
-// 	val, ok := s.results[key]
-// 	return val, ok
-//}
-
 func (s *ResultStore) Save(token string, key string, value float64) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

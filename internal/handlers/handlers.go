@@ -13,6 +13,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// PostHandler godoc
+// @Summary Сложение чисел
+// @Description Принимает массив чисел и токен, возвращает сумму и сохраняет результат по токену
+// @Tags math
+// @Accept json
+// @Produce json
+// @Param input body models.Numbers true "Входные данные с токеном и числами"
+// @Success 200 {object} models.SumResponse
+// @Failure 400 {object} echo.HTTPError
+// @Router /sum [post]
+
 func PostHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var nums models.Numbers
@@ -46,6 +57,18 @@ func PostHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFu
 		return c.JSON(http.StatusOK, resp)
 	}
 }
+
+// MultiplyHandler godoc
+// @Summary Умножение чисел
+// @Description Принимает массив чисел и токен, возвращает произведение и сохраняет результат по токену
+// @Tags math
+// @Accept json
+// @Produce json
+// @Param input body models.Numbers true "Входные данные с токеном и числами"
+// @Success 200 {object} models.MultiplyResponse
+// @Failure 400 {object} echo.HTTPError
+// @Router /multiply [post]
+
 func MultiplyHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var req models.Numbers
@@ -77,6 +100,16 @@ func MultiplyHandler(logger *slog.Logger, store *storage.ResultStore) echo.Handl
 	}
 }
 
+// GetAllResultsByTokenHandler godoc
+// @Summary Получение всех результатов по токену
+// @Description Возвращает все сохранённые результаты (суммы и произведения) для заданного токена
+// @Tags math
+// @Produce json
+// @Param token query string true "Токен пользователя"
+// @Success 200 {object} map[string]float64
+// @Failure 400 {object} echo.HTTPError
+// @Router /results [get]
+
 func GetAllResultsByTokenHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		token := c.QueryParam("token")
@@ -90,10 +123,3 @@ func GetAllResultsByTokenHandler(logger *slog.Logger, store *storage.ResultStore
 		return c.JSON(http.StatusOK, results)
 	}
 }
-
-// func GetAllResultsHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		results := store.GetAll()
-// 		return c.JSON(http.StatusOK, results)
-// 	}
-// }
