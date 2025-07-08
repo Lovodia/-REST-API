@@ -14,8 +14,7 @@
 // 	Produces:
 // 	-application/json
 
-// 	Swagger:meta
-
+// Swagger:meta
 package main
 
 import (
@@ -30,15 +29,23 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"github.com/Lovodia/restapi/docs"
 	_ "github.com/Lovodia/restapi/docs"
 	"github.com/Lovodia/restapi/internal/handlers"
 	"github.com/Lovodia/restapi/internal/storage"
 	"github.com/Lovodia/restapi/pkg/config"
 	loggerswitch "github.com/Lovodia/restapi/pkg/logger"
 	echoSwagger "github.com/swaggo/echo-swagger"
+	_ "github.com/swaggo/files"
 )
 
+// @title CalculatorAPI
+// @version 1.0
+// @description API для вычисления суммы и произведения
+// @host localhost:8080
+// @BasePath /
 func main() {
+	docs.SwaggerInfo.Schemes = []string{"http"}
 	cfg, err := config.LoadConfig("config.yaml")
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)

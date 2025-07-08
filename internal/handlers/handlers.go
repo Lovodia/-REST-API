@@ -21,9 +21,8 @@ import (
 // @Produce json
 // @Param input body models.Numbers true "Входные данные с токеном и числами"
 // @Success 200 {object} models.SumResponse
-// @Failure 400 {object} echo.HTTPError
+// @Failure 400 {object} models.ErrorResponse
 // @Router /sum [post]
-
 func PostHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var nums models.Numbers
@@ -66,9 +65,8 @@ func PostHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFu
 // @Produce json
 // @Param input body models.Numbers true "Входные данные с токеном и числами"
 // @Success 200 {object} models.MultiplyResponse
-// @Failure 400 {object} echo.HTTPError
+// @Failure 400 {object} models.ErrorResponse
 // @Router /multiply [post]
-
 func MultiplyHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var req models.Numbers
@@ -107,9 +105,8 @@ func MultiplyHandler(logger *slog.Logger, store *storage.ResultStore) echo.Handl
 // @Produce json
 // @Param token query string true "Токен пользователя"
 // @Success 200 {object} map[string]float64
-// @Failure 400 {object} echo.HTTPError
+// @Failure 400 {object} models.ErrorResponse
 // @Router /results [get]
-
 func GetAllResultsByTokenHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		token := c.QueryParam("token")

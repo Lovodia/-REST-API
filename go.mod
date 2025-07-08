@@ -6,6 +6,7 @@ require (
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/swaggo/echo-swagger v1.4.1
+	github.com/swaggo/files v1.0.1
 	github.com/swaggo/swag v1.16.4
 	gopkg.in/yaml.v3 v3.0.1
 )

@@ -14,3 +14,6 @@ type MultiplyResponse struct {
 	Token    string  `json:"token"`
 	Multiply float64 `json:"multiply"`
 }
+type ErrorResponse struct {
+	Message string `json:"message"`
+}

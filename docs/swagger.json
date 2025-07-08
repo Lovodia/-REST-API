@@ -1,7 +1,177 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API для вычисления суммы и произведения",
+        "title": "CalculatorAPI",
+        "contact": {},
+        "version": "1.0"
     },
-    "paths": {}
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/multiply": {
+            "post": {
+                "description": "Принимает массив чисел и токен, возвращает произведение и сохраняет результат по токену",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "math"
+                ],
+                "summary": "Умножение чисел",
+                "parameters": [
+                    {
+                        "description": "Входные данные с токеном и числами",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Numbers"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.MultiplyResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/results": {
+            "get": {
+                "description": "Возвращает все сохранённые результаты (суммы и произведения) для заданного токена",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "math"
+                ],
+                "summary": "Получение всех результатов по токену",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Токен пользователя",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sum": {
+            "post": {
+                "description": "Принимает массив чисел и токен, возвращает сумму и сохраняет результат по токену",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "math"
+                ],
+                "summary": "Сложение чисел",
+                "parameters": [
+                    {
+                        "description": "Входные данные с токеном и числами",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Numbers"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SumResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.MultiplyResponse": {
+            "type": "object",
+            "properties": {
+                "multiply": {
+                    "type": "number"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Numbers": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
+        "models.SumResponse": {
+            "type": "object",
+            "properties": {
+                "sum": {
+                    "type": "number"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }
