@@ -58,7 +58,7 @@ func main() {
 	e.Use(middleware.RequestID())
 	e.Use(middleware.Recover())
 
-	e.POST("/sum", handlers.PostHandler(logger, store))
+	e.POST("/sum", handlers.SumHandler(logger, store))
 	e.POST("/multiply", handlers.MultiplyHandler(logger, store))
 	e.GET("/results", handlers.GetAllResultsByTokenHandler(logger, store))
 	e.GET("/swagger/*", echoSwagger.WrapHandler)

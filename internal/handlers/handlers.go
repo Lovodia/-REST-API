@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// PostHandler godoc
+// SumHandler godoc
 // @Summary Сложение чисел
 // @Description Принимает массив чисел и токен, возвращает сумму и сохраняет результат по токену
 // @Tags math
@@ -23,7 +23,7 @@ import (
 // @Success 200 {object} models.SumResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Router /sum [post]
-func PostHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
+func SumHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var nums models.Numbers
 		if err := c.Bind(&nums); err != nil {
@@ -35,11 +35,7 @@ func PostHandler(logger *slog.Logger, store *storage.ResultStore) echo.HandlerFu
 			return echo.NewHTTPError(http.StatusBadRequest, "Token is requived")
 		}
 
-		if nums.Values == nil {
-			logger.Info("Received numbers", "values", "nil slice")
-		} else {
-			logger.Info("Received numbers", "values", nums.Values)
-		}
+		logger.Info("Received numbers", "values", nums.Values)
 
 		total := usecase.CalculateSum(nums.Values)
 
@@ -77,11 +73,8 @@ func MultiplyHandler(logger *slog.Logger, store *storage.ResultStore) echo.Handl
 		if req.Token == "" {
 			return echo.NewHTTPError(http.StatusBadRequest, "Token is requived")
 		}
-		if req.Values == nil {
-			logger.Info("Received numbers", "values", "nil slice")
-		} else {
-			logger.Info("Received numbers", "values", req.Values)
-		}
+
+		logger.Info("Received numbers", "values", req.Values)
 
 		multiply := usecase.CalculatedMultiply(req.Values)
 
