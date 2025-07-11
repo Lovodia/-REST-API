@@ -1,0 +1,118 @@
+basePath: /
+definitions:
+  models.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.MultiplyResponse:
+    properties:
+      multiply:
+        type: number
+      token:
+        type: string
+    type: object
+  models.Numbers:
+    properties:
+      token:
+        type: string
+      values:
+        items:
+          type: number
+        type: array
+    type: object
+  models.SumResponse:
+    properties:
+      sum:
+        type: number
+      token:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для вычисления суммы и произведения
+  title: CalculatorAPI
+  version: "1.0"
+paths:
+  /multiply:
+    post:
+      consumes:
+      - application/json
+      description: Принимает массив чисел и токен, возвращает произведение и сохраняет
+        результат по токену
+      parameters:
+      - description: Входные данные с токеном и числами
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Numbers'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MultiplyResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Умножение чисел
+      tags:
+      - math
+  /results:
+    get:
+      description: Возвращает все сохранённые результаты (суммы и произведения) для
+        заданного токена
+      parameters:
+      - description: Токен пользователя
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: number
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получение всех результатов по токену
+      tags:
+      - math
+  /sum:
+    post:
+      consumes:
+      - application/json
+      description: Принимает массив чисел и токен, возвращает сумму и сохраняет результат
+        по токену
+      parameters:
+      - description: Входные данные с токеном и числами
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Numbers'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SumResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Сложение чисел
+      tags:
+      - math
+swagger: "2.0"
