@@ -11,6 +11,8 @@ import (
 
 	"github.com/Lovodia/restapi/internal/storage"
 	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSumAndMultiplyHandlers(t *testing.T) {
@@ -41,31 +43,30 @@ func TestSumAndMultiplyHandlers(t *testing.T) {
 			wantKey:   "multiply",
 			wantValue: 30,
 		},
-		// Закоммитил для прохождения теста
-		// {
-		// 	name:     "Sum missing token",
-		// 	path:     "/sum",
-		// 	body:     `{"token":"","values":[1,2]}`,
-		// 	wantCode: http.StatusBadRequest,
-		// },
-		// {
-		// 	name:     "Multiply missing token",
-		// 	path:     "/multiply",
-		// 	body:     `{"token":"","values":[1,2]}`,
-		// 	wantCode: http.StatusBadRequest,
-		// },
-		// {
-		// 	name:     "Sum invalid JSON",
-		// 	path:     "/sum",
-		// 	body:     `{"token":"abc", "values":`,
-		// 	wantCode: http.StatusBadRequest,
-		// },
-		// {
-		// 	name:     "Multiply invalid JSON",
-		// 	path:     "/multiply",
-		// 	body:     `{"token":"abc", "values":`,
-		// 	wantCode: http.StatusBadRequest,
-		// },
+		{
+			name:     "Sum missing token",
+			path:     "/sum",
+			body:     `{"token":"","values":[1,2]}`,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name:     "Multiply missing token",
+			path:     "/multiply",
+			body:     `{"token":"","values":[1,2]}`,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name:     "Sum invalid JSON",
+			path:     "/sum",
+			body:     `{"token":"abc", "values":`,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name:     "Multiply invalid JSON",
+			path:     "/multiply",
+			body:     `{"token":"abc", "values":`,
+			wantCode: http.StatusBadRequest,
+		},
 	}
 
 	for _, tt := range tests {
@@ -85,37 +86,21 @@ func TestSumAndMultiplyHandlers(t *testing.T) {
 
 		err := handler(c)
 
-		if rec.Code != tt.wantCode {
-			t.Errorf("%s: got status %d, want %d", tt.name, rec.Code, tt.wantCode)
-			continue
-		}
+		require.Equal(t, tt.wantCode, rec.Code, "%s: HTTP status", tt.name)
 
 		if tt.wantCode != http.StatusOK {
-			if err == nil {
-				t.Errorf("%s: expected error, got none", tt.name)
-			}
+			require.Error(t, err, "%s: expected error", tt.name)
 			continue
 		}
 
-		if err != nil {
-			t.Errorf("%s: unexpected error: %v", tt.name, err)
-			continue
-		}
+		require.NoError(t, err, "%s: unexpected handler error", tt.name)
 
 		var resp map[string]interface{}
-		if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
-			t.Errorf("%s: JSON unmarshal error: %v", tt.name, err)
-			continue
-		}
+		require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &resp), "%s: JSON unmarshal", tt.name)
 
 		val, ok := resp[tt.wantKey]
-		if !ok {
-			t.Errorf("%s: missing key %q in response", tt.name, tt.wantKey)
-			continue
-		}
-		if val.(float64) != tt.wantValue {
-			t.Errorf("%s: %s = %v; want %v", tt.name, tt.wantKey, val, tt.wantValue)
-		}
+		require.True(t, ok, "%s: missing key %q", tt.name, tt.wantKey)
+		assert.Equal(t, tt.wantValue, val.(float64), "%s: %s value", tt.name, tt.wantKey)
 	}
 }
 func TestGetAllResultsByTokenHandler_Success(t *testing.T) {
@@ -138,7 +123,7 @@ func TestGetAllResultsByTokenHandler_Success(t *testing.T) {
 	}
 
 	if rec.Code != http.StatusOK {
-		t.Errorf("expected 200, а received %d", rec.Code)
+		t.Errorf("expected 200, received %d", rec.Code)
 	}
 
 	var results map[string]float64
@@ -147,7 +132,7 @@ func TestGetAllResultsByTokenHandler_Success(t *testing.T) {
 	}
 
 	if len(results) != 2 {
-		t.Errorf("expected 2 results, а received %d", len(results))
+		t.Errorf("expected 2 results, received %d", len(results))
 	}
 
 	if results["sum_1"] != 5.0 || results["mul_1"] != 6.0 {
